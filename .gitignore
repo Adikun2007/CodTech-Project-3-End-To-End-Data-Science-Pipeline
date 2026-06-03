@@ -1,0 +1,7 @@
+creditcard.csv
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+plots_results.png

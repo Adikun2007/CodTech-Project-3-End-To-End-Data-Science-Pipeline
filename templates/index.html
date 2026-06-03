@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credit Card Fraud Detection</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --panel-soft: #fbfcfd;
+      --text: #18202b;
+      --muted: #687385;
+      --border: #dce1e8;
+      --primary: #1f6feb;
+      --primary-dark: #174ea6;
+      --primary-soft: #eaf2ff;
+      --danger: #c93636;
+      --danger-soft: #fff0f0;
+      --safe: #267a46;
+      --safe-soft: #edf8f1;
+      --warning: #8a5a00;
+      --warning-soft: #fff7df;
+      --shadow: 0 14px 32px rgba(24, 32, 43, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    .topbar {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: #19324f;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 1px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .status-pill {
+      border: 1px solid #b7d2ff;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .intro {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 22px 22px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 24px;
+      align-items: end;
+    }
+
+    .intro h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.7rem, 4vw, 2.75rem);
+      line-height: 1.1;
+      letter-spacing: 0;
+      max-width: 720px;
+    }
+
+    .intro p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 690px;
+      font-size: 1rem;
+    }
+
+    .summary-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-panel h3 {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .summary-row:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .summary-row span:first-child {
+      color: var(--muted);
+    }
+
+    .summary-row span:last-child {
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .layout {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 14px 22px 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .panel-header p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    .section-title {
+      margin: 4px 0 12px;
+      color: #3a4555;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .main-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      color: #465365;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 400;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--panel-soft);
+      color: var(--text);
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 0.9rem;
+    }
+
+    input[type="number"]:focus {
+      outline: 3px solid rgba(31, 111, 235, 0.14);
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .feature-grid label {
+      font-size: 0.72rem;
+    }
+
+    .feature-grid input {
+      height: 34px;
+      padding: 6px 7px;
+      font-size: 0.78rem;
+    }
+
+    .actions {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      flex: 1 1 190px;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #edf1f5;
+      color: #263241;
+      border: 1px solid var(--border);
+    }
+
+    .btn-light {
+      background: #fff;
+      color: #465365;
+      border: 1px solid var(--border);
+    }
+
+    .side {
+      display: grid;
+      gap: 16px;
+    }
+
+    .result {
+      border-top: 5px solid #9aa6b5;
+    }
+
+    .result.is-fraud {
+      border-top-color: var(--danger);
+    }
+
+    .result.is-legit {
+      border-top-color: var(--safe);
+    }
+
+    .verdict {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .verdict-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #eef1f5;
+      color: #465365;
+      font-size: 1.15rem;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .is-fraud .verdict-icon {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .is-legit .verdict-icon {
+      background: var(--safe-soft);
+      color: var(--safe);
+    }
+
+    .verdict h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .verdict p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .probability {
+      margin-top: 18px;
+    }
+
+    .probability-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.83rem;
+      margin-bottom: 7px;
+    }
+
+    .probability-row strong {
+      color: var(--text);
+    }
+
+    .track {
+      height: 9px;
+      border-radius: 999px;
+      background: #edf1f5;
+      overflow: hidden;
+    }
+
+    .fill {
+      width: 0;
+      height: 100%;
+      border-radius: 999px;
+      background: #9aa6b5;
+      transition: width 450ms ease;
+    }
+
+    .is-fraud .fill {
+      background: var(--danger);
+    }
+
+    .is-legit .fill {
+      background: var(--safe);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .metric {
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 11px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 1rem;
+    }
+
+    .note {
+      background: var(--warning-soft);
+      border: 1px solid #f2d98b;
+      color: var(--warning);
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 0.84rem;
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #684300;
+    }
+
+    .info-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-list li {
+      display: flex;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .info-list li::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .error {
+      margin-bottom: 14px;
+      border: 1px solid #efb1b1;
+      background: var(--danger-soft);
+      color: var(--danger);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      display: none;
+    }
+
+    footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 22px 28px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--primary-dark);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .intro,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-panel {
+        max-width: 520px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .topbar-inner,
+      .panel-header,
+      .main-fields,
+      .actions {
+        align-items: stretch;
+      }
+
+      .topbar-inner,
+      .panel-header {
+        flex-direction: column;
+      }
+
+      .status-pill {
+        align-self: flex-start;
+      }
+
+      .main-fields {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">FS</div>
+        <div>
+          <h1>FraudShield</h1>
+          <p>Credit card fraud detection with Flask and ML</p>
+        </div>
+      </div>
+      <div class="status-pill">Model API active</div>
+    </div>
+  </header>
+
+  <section class="intro">
+    <div>
+      <h2>Check whether a transaction looks suspicious.</h2>
+      <p>
+        Enter the transaction details below, or load the sample transaction to test the model.
+        The app returns a fraud probability and compares it with your tuned threshold.
+      </p>
+    </div>
+
+    <aside class="summary-panel" aria-label="Project summary">
+      <h3>Project summary</h3>
+      <div class="summary-row">
+        <span>Model</span>
+        <span>XGBoost classifier</span>
+      </div>
+      <div class="summary-row">
+        <span>Inputs</span>
+        <span>Time, V1-V28, Amount</span>
+      </div>
+      <div class="summary-row">
+        <span>Output</span>
+        <span>Probability + verdict</span>
+      </div>
+    </aside>
+  </section>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h3>Transaction details</h3>
+          <p>All fields are required because the model expects the original 30-feature order.</p>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <div id="form-error" class="error"></div>
+
+        <div class="section-title">Basic transaction fields</div>
+        <div class="main-fields">
+          <div class="field">
+            <label for="Time">Time</label>
+            <input type="number" id="Time" step="any" placeholder="406" />
+            <span class="hint">Seconds since the first transaction in the dataset</span>
+          </div>
+
+          <div class="field">
+            <label for="Amount">Amount</label>
+            <input type="number" id="Amount" step="any" placeholder="239.93" />
+            <span class="hint">Transaction amount</span>
+          </div>
+        </div>
+
+        <div class="section-title">Anonymised PCA features</div>
+        <div class="feature-grid" id="feature-grid"></div>
+
+        <div class="actions">
+          <button class="btn-primary" id="predict-btn" type="button" onclick="predict()">Run detection</button>
+          <button class="btn-secondary" type="button" onclick="loadSample()">Load sample</button>
+          <button class="btn-light" type="button" onclick="clearForm()">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="panel result" id="result-card">
+        <div class="panel-body">
+          <div class="verdict">
+            <div class="verdict-icon" id="result-icon">?</div>
+            <div>
+              <h3 id="result-title">Awaiting analysis</h3>
+              <p id="result-message">Submit a transaction to see the prediction result.</p>
+            </div>
+          </div>
+
+          <div class="probability">
+            <div class="probability-row">
+              <span>Fraud probability</span>
+              <strong id="probability-text">--</strong>
+            </div>
+            <div class="track">
+              <div class="fill" id="probability-fill"></div>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <span>Raw score</span>
+              <strong id="raw-score">--</strong>
+            </div>
+            <div class="metric">
+              <span>Threshold</span>
+              <strong id="threshold">--</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="note">
+        <strong>Use the result as model guidance.</strong>
+        A high score means the transaction pattern is similar to fraud cases in the training data.
+        Real systems should still include review rules and monitoring.
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>How this form works</h3>
+            <p>The same order and scaling used during training is kept here.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <ul class="info-list">
+            <li>Time and Amount are scaled before prediction.</li>
+            <li>V1 to V28 are anonymised transformed features from the dataset.</li>
+            <li>The final verdict uses your saved best threshold, not a fixed 0.5 cutoff.</li>
+          </ul>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    Built by Adikun using Flask, Scikit-learn and XGBoost.
+    <a href="https://github.com/Adikun2007" target="_blank" rel="noreferrer">GitHub</a>
+  </footer>
+
+  <script>
+    const features = ["Time", ...Array.from({ length: 28 }, (_, i) => `V${i + 1}`), "Amount"];
+    const featureGrid = document.getElementById("feature-grid");
+    const formError = document.getElementById("form-error");
+    const predictButton = document.getElementById("predict-btn");
+
+    for (let i = 1; i <= 28; i += 1) {
+      const field = document.createElement("div");
+      field.className = "field";
+      field.innerHTML = `
+        <label for="V${i}">V${i}</label>
+        <input type="number" id="V${i}" step="any" placeholder="0.0" />
+      `;
+      featureGrid.appendChild(field);
+    }
+
+    function showError(message) {
+      formError.textContent = message;
+      formError.style.display = "block";
+    }
+
+    function hideError() {
+      formError.textContent = "";
+      formError.style.display = "none";
+    }
+
+    function setResultState(state, data = null) {
+      const card = document.getElementById("result-card");
+      const icon = document.getElementById("result-icon");
+      const title = document.getElementById("result-title");
+      const message = document.getElementById("result-message");
+      const probabilityText = document.getElementById("probability-text");
+      const probabilityFill = document.getElementById("probability-fill");
+      const rawScore = document.getElementById("raw-score");
+      const threshold = document.getElementById("threshold");
+
+      card.className = "panel result";
+
+      if (state === "loading") {
+        icon.textContent = "...";
+        title.textContent = "Analyzing transaction";
+        message.textContent = "The model is calculating the fraud probability.";
+        probabilityText.textContent = "--";
+        probabilityFill.style.width = "0%";
+        rawScore.textContent = "--";
+        threshold.textContent = "--";
+        return;
+      }
+
+      if (state === "empty") {
+        icon.textContent = "?";
+        title.textContent = "Awaiting analysis";
+        message.textContent = "Submit a transaction to see the prediction result.";
+        probabilityText.textContent = "--";
+        probabilityFill.style.width = "0%";
+        rawScore.textContent = "--";
+        threshold.textContent = "--";
+        return;
+      }
+
+      const isFraud = data.fraud;
+      const probability = Number(data.probability);
+      const probabilityPercent = Math.max(0, Math.min(100, probability * 100));
+
+      card.classList.add(isFraud ? "is-fraud" : "is-legit");
+      icon.textContent = isFraud ? "!" : "OK";
+      title.textContent = isFraud ? "Fraud detected" : "Legitimate transaction";
+      message.textContent = isFraud
+        ? "This transaction is above the saved fraud threshold."
+        : "This transaction is below the saved fraud threshold.";
+      probabilityText.textContent = `${probabilityPercent.toFixed(1)}%`;
+      probabilityFill.style.width = `${probabilityPercent}%`;
+      rawScore.textContent = probability.toFixed(4);
+      threshold.textContent = Number(data.threshold_used).toFixed(4);
+    }
+
+    function collectInputs() {
+      const payload = {};
+
+      for (const feature of features) {
+        const input = document.getElementById(feature);
+        const value = input.value.trim();
+
+        if (value === "") {
+          throw new Error(`${feature} is empty. Fill all fields or click Load sample.`);
+        }
+
+        const numberValue = Number(value);
+        if (!Number.isFinite(numberValue)) {
+          throw new Error(`${feature} must be a valid number.`);
+        }
+
+        payload[feature] = numberValue;
+      }
+
+      return payload;
+    }
+
+    async function loadSample() {
+      hideError();
+
+      try {
+        const response = await fetch("/sample");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not load the sample transaction.");
+        }
+
+        Object.entries(data).forEach(([key, value]) => {
+          const input = document.getElementById(key);
+          if (input) input.value = value;
+        });
+
+        setResultState("empty");
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    function clearForm() {
+      hideError();
+      document.querySelectorAll('input[type="number"]').forEach((input) => {
+        input.value = "";
+      });
+      setResultState("empty");
+    }
+
+    async function predict() {
+      hideError();
+
+      let payload;
+      try {
+        payload = collectInputs();
+      } catch (error) {
+        showError(error.message);
+        return;
+      }
+
+      setResultState("loading");
+      predictButton.disabled = true;
+      predictButton.textContent = "Running...";
+
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "Prediction failed.");
+        }
+
+        setResultState("result", data);
+      } catch (error) {
+        setResultState("empty");
+        showError(error.message);
+      } finally {
+        predictButton.disabled = false;
+        predictButton.textContent = "Run detection";
+      }
+    }
+  </script>
+</body>
+</html>
